@@ -59,7 +59,11 @@ def update():
 
 tournament_list = PlayerList()
 rounds = 5
-# tournament_list.add_player("Test", "test2",1900)
+tournament_started = False
+tournament_list.add_player("Adam", "Dziwoki", 1965)
+tournament_list.add_player("Uladzislau", "Zakrzheuski", 2295)
+tournament_list.add_player("Mariusz", "Stanaszek", 1651)
+tournament_list.add_player("Krzysztof", "Sieja", 1840)
 
 # COMMANDS
 
@@ -73,11 +77,32 @@ def addp_add():
     print(tournament_list.list_of_players)
 
 def rmvp_rem():
-    stn = stn_entry.get()
+    stn = int(stn_entry.get())
     player_to_delete = tournament_list.find_player_by_starting_number(stn)
-    del tournament_list.list_of_players[player_to_delete-1]
+    tournament_list.remove_player(stn)
     rmvp.destroy()
     update()
+
+def srft_set():
+    rnds = int(srft_entry.get())
+    global rounds
+    rounds = rnds
+    srft.destroy()
+    update()
+
+def set_rounds_window():
+    global srft
+    srft = Toplevel(window)
+    srft.config(padx=50, pady=50)
+    srft.title('Set rounds')
+    srft_label = Label(srft, text="Number of rounds:")
+    srft_label.grid(column=0, row=0)
+    global srft_entry
+    srft_entry = Entry(srft, width=40)
+    srft_entry.grid(column=1, row=0)
+
+    srft_button = Button(srft, text="Set rounds", width=20, command=srft_set)
+    srft_button.grid(column=0, row=1, columnspan=2)
 
 def remove_player_window():
     global rmvp
@@ -94,7 +119,8 @@ def remove_player_window():
     addp_button = Button(rmvp, text="Remove player", width=20, command=rmvp_rem)
     addp_button.grid(column=0, row=1, columnspan=2)
 
-    update()
+    # update()
+
 
 def add_player_window():
     global addp
@@ -125,7 +151,46 @@ def add_player_window():
     addp_button = Button(addp, text="Add player", width=20, command=addp_add)
     addp_button.grid(column=0, row=3, columnspan=2)
 
+    # update()
+current_pairing = []
+def start_tournament():
+    global tournament_started
+    tournament_started = True
+    add_player_button.destroy()
+    remove_player_button.destroy()
+    start_tournament_button.destroy()
+    set_rounds_button.destroy()
+    # choose_pairing_method(tournament_list, rounds)
+    global current_pairing
+    current_pairing = sp_pairing_for_next_round(tournament_list)
+    set_results_window(current_pairing, tournament_list)
+
+def reswin_input(pairlist):
+    results_inputted = ""
+    for pair in pairlist:
+        results_inputted += str((pair.get()))
+    resolve_round(current_pairing, tournament_list, results_inputted)
+    reswin.destroy()
     update()
+
+def set_results_window(pairs, playerlist):
+    global reswin
+    reswin = Toplevel(window)
+    reswin.config(padx=50, pady=50)
+    reswin.title('Round results')
+    global pairlist
+    pairlist = []
+    a = 0
+    for p in pairs:
+        player_A = playerlist.list_of_players[playerlist.find_player_by_starting_number(p.player1)]
+        player_B = playerlist.list_of_players[playerlist.find_player_by_starting_number(p.player2)]
+        winner = IntVar()
+        pA = Radiobutton(reswin, text=f"{player_A.name} {player_A.surname}", variable=winner, value=1).grid(row=a, column=0)
+        pB = Radiobutton(reswin, text=f"{player_B.name} {player_B.surname}", variable=winner, value=2).grid(row=a, column=1)
+        pairlist.append(winner)
+        a+=1
+    reswin_button = Button(reswin, text="Input results", width=20, command=lambda: reswin_input(pairlist))
+    reswin_button.grid(row=a+1, column=0, columnspan=2)
 
 
 
@@ -146,11 +211,20 @@ title_label = Label(text="Shogi Tournament Manager", font=(FONT_NAME, 40, "bold"
 title_label.grid(column=0, row=0, columnspan=2)
 
 
+set_rounds_button = Button(text="Set number of rounds", width=20, command=set_rounds_window)
+set_rounds_button.grid(column=0, row=3)
+
 add_player_button = Button(text="Add player", width=20, command=add_player_window)
-add_player_button.grid(column=0, row=3)
+add_player_button.grid(column=0, row=4)
 
 remove_player_button = Button(text="Remove player", width=20, command=remove_player_window)
-remove_player_button.grid(column=0, row=4)
+remove_player_button.grid(column=0, row=5)
+
+start_tournament_button = Button(text="Start tournament", width=20, command=start_tournament)
+start_tournament_button.grid(column=0, row=6)
+
+
+
 
 
 update()

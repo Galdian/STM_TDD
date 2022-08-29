@@ -28,6 +28,16 @@ class PlayerList:
             player.starting_number = starting_number
             starting_number += 1
 
+    def remove_player(self, starting_number):
+        del self.list_of_players[starting_number-1]
+        self.sort_player_list()
+        starting_number = 1
+        for player in self.list_of_players:
+            player.starting_number = starting_number
+            starting_number += 1
+
+
+
     def sort_player_list(self):
         self.list_of_players.sort(key=lambda player: (player.surname, player.name))
         self.list_of_players.sort(reverse=True, key=lambda player: (player.points, player.sos, player.sosos, player.sodos, player.rating))
