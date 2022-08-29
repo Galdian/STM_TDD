@@ -37,6 +37,12 @@ def test_find_player():
     new_player_list = PlayerList()
     new_player_list.add_player("Krzysztof", "Sieja", 1800)
     new_player_list.add_player("Adam", "Dziwoki", 1900)
-    new_player_list.sort_player_list()
     tested_player = new_player_list.list_of_players[new_player_list.find_player_by_starting_number(2)]
     print(tested_player.name)
+
+
+def test_update_tiebreaks():
+    new_player_list = PlayerList()
+    new_player_list.add_player("Krzysztof", "Sieja", 1800)
+    new_player_list.add_player("Adam", "Dziwoki", 1900)
+    new_player_list.update_tiebreaks()
