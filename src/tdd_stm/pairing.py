@@ -3,26 +3,26 @@ from dataclasses import dataclass, field
 import itertools
 import random
 
-
-def choose_pairing_method(playerlist: PlayerList, rounds: int):
-    # print(f"Chosing pairing method for {len(playerlist.list_of_players)} players and {rounds} rounds.")
-    players = len(playerlist.list_of_players)
-    if not len(playerlist.list_of_players) / 2 == 0:
-        players += 1
-    if players - rounds == 1:
-        # print("Round robin chosen")
-        round_robin_pairing(playerlist)
-    else:
-        # print("Swiss pairing chosen")
-        swiss_pairing(playerlist, rounds)
-
-def swiss_pairing(playerlist, rounds):
-    results_updated = True
-    r = 1
-    while results_updated and r <= rounds:
-        sp_next_round(playerlist)
-
-    resolve_round(pairs, playerlist)
+#
+# def choose_pairing_method(playerlist: PlayerList, rounds: int):
+#     # print(f"Chosing pairing method for {len(playerlist.list_of_players)} players and {rounds} rounds.")
+#     players = len(playerlist.list_of_players)
+#     if not len(playerlist.list_of_players) / 2 == 0:
+#         players += 1
+#     if players - rounds == 1:
+#         # print("Round robin chosen")
+#         round_robin_pairing(playerlist)
+#     else:
+#         # print("Swiss pairing chosen")
+#         swiss_pairing(playerlist, rounds)
+#
+# def swiss_pairing(playerlist, rounds):
+#     results_updated = True
+#     r = 1
+#     while results_updated and r <= rounds:
+#         sp_next_round(playerlist)
+#
+#     resolve_round(pairs, playerlist)
 
 
 
@@ -315,6 +315,7 @@ def round_robin_pairing(playerlist: PlayerList):
     rounds = players_num - 1
     pairs = int(players_num / 2)
     # print(players_to_be_paired)
+    pairlist = []
     for r in range(rounds):
         first_paired_player = 0
         second_paired_player = rounds
@@ -324,11 +325,11 @@ def round_robin_pairing(playerlist: PlayerList):
                 add_pair(players_to_be_paired[first_paired_player], players_to_be_paired[second_paired_player]))
             first_paired_player += 1
             second_paired_player -= 1
-        resolve_round(current_pairs, playerlist)
+        pairlist.append(current_pairs)
         player_moved = players_to_be_paired[rounds]
         players_to_be_paired.insert(1, player_moved)
         players_to_be_paired.pop()
-
+    return pairlist
 
 def resolve_round(pairs: list, playerlist: PlayerList, results: str):
     a = 0

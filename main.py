@@ -51,14 +51,14 @@ def update():
                                f'{player.rating}', f'{player.points}', f'{player.sos}', f'{player.sosos}',
                                f'{player.sodos}', f'{player.opponents}'))
         a += 1
-    my_game.grid(column=1, row=1)
+    my_game.grid(column=1, row=1, rowspan=5)
     left_label = Label(text=f"Rounds: {rounds} \nPlayers: {len(tournament_list.list_of_players)}")
     left_label.grid(column=0, row=1)
 
 # START
 
 tournament_list = PlayerList()
-rounds = 5
+rounds = 3
 tournament_started = False
 tournament_list.add_player("Adam", "Dziwoki", 1965)
 tournament_list.add_player("Uladzislau", "Zakrzheuski", 2295)
@@ -70,7 +70,7 @@ tournament_list.add_player("Krzysztof", "Sieja", 1840)
 def addp_add():
     name = name_entry.get()
     surname = surname_entry.get()
-    rating = rating_entry.get()
+    rating = int(rating_entry.get())
     tournament_list.add_player(name, surname, rating)
     addp.destroy()
     update()
@@ -153,6 +153,7 @@ def add_player_window():
 
     # update()
 current_pairing = []
+is_round_robin = False
 def start_tournament():
     global tournament_started
     tournament_started = True
@@ -160,10 +161,36 @@ def start_tournament():
     remove_player_button.destroy()
     start_tournament_button.destroy()
     set_rounds_button.destroy()
+    messagebox.showinfo(title="Onegaishimasu!", message="The tournament is ready to go, please enjoy your games!")
     # choose_pairing_method(tournament_list, rounds)
+    global is_round_robin
+    if len(tournament_list.list_of_players) - rounds == 1:
+        is_round_robin = True
+    global next_round_button
+    next_round_button = Button(text="Next round", width=20, command=next_round)
+    next_round_button.grid(column=0, row=2)
+    next_round()
+
+rr_pairing = []
+round = 1
+def next_round():
+    global round
     global current_pairing
-    current_pairing = sp_pairing_for_next_round(tournament_list)
+    global rr_pairing
+    if is_round_robin:
+        if round == 1:
+            rr_pairing = round_robin_pairing(tournament_list)
+        print(rr_pairing)
+        current_pairing = rr_pairing[round-1]
+    else:
+        current_pairing = sp_pairing_for_next_round(tournament_list)
     set_results_window(current_pairing, tournament_list)
+    round += 1
+
+def exit_program():
+    print("exit")
+    global exit
+    exit = True
 
 def reswin_input(pairlist):
     results_inputted = ""
@@ -171,26 +198,36 @@ def reswin_input(pairlist):
         results_inputted += str((pair.get()))
     resolve_round(current_pairing, tournament_list, results_inputted)
     reswin.destroy()
+    if round > rounds:
+        messagebox.showinfo(title="Arigato gozaimashita!", message="The tournament is completed!")
+        next_round_button.destroy()
+        exit_button = Button(text="Exit", width=20, command=exit_program)
+        exit_button.grid(column=0, row=2)
     update()
+
+
 
 def set_results_window(pairs, playerlist):
     global reswin
     reswin = Toplevel(window)
     reswin.config(padx=50, pady=50)
     reswin.title('Round results')
+    reswin_label = Label(reswin, text="Please input results:")
+    reswin_label.grid(row=0, column=0, columnspan=3)
     global pairlist
     pairlist = []
-    a = 0
+    a = 1
     for p in pairs:
         player_A = playerlist.list_of_players[playerlist.find_player_by_starting_number(p.player1)]
         player_B = playerlist.list_of_players[playerlist.find_player_by_starting_number(p.player2)]
+        board_label = Label(reswin, text=f"Board {a}:").grid(row=a, column=0)
         winner = IntVar()
-        pA = Radiobutton(reswin, text=f"{player_A.name} {player_A.surname}", variable=winner, value=1).grid(row=a, column=0)
-        pB = Radiobutton(reswin, text=f"{player_B.name} {player_B.surname}", variable=winner, value=2).grid(row=a, column=1)
+        pA = Radiobutton(reswin, text=f"{player_A.name} {player_A.surname}", variable=winner, value=1).grid(row=a, column=1)
+        pB = Radiobutton(reswin, text=f"{player_B.name} {player_B.surname}", variable=winner, value=2).grid(row=a, column=2)
         pairlist.append(winner)
         a+=1
     reswin_button = Button(reswin, text="Input results", width=20, command=lambda: reswin_input(pairlist))
-    reswin_button.grid(row=a+1, column=0, columnspan=2)
+    reswin_button.grid(row=a+1, column=1)
 
 
 
