@@ -282,8 +282,8 @@ def sort_pairings(playerlist: PlayerList, possible_pairings: list):
         index += 1
     pairings.sort(key=lambda pairing: (
     pairing.highest_points_diff, pairing.total_points_diff, pairing.sos_diff, pairing.sosos_diff))
-    for pairing in pairings:
-        print(pairing)
+    # for pairing in pairings:
+    #     print(pairing)
     if len(pairings) > 0:
         return pairings[0].index
     else:
@@ -350,7 +350,7 @@ def resolve_round(pairs: list, playerlist: PlayerList, results: str):
             # print(f"{player_A.name} {player_A.surname} vs {player_B.name} {player_B.surname}")
             # result = input("Which player has won? a or b")
             # print(f"Which player has won? a or b? {result}")
-            print(results)
+
             if results[a] == "1":
                 player_A.points += 1
                 player_A.opponents.append(f"{player_B.starting_number}+")
@@ -361,7 +361,7 @@ def resolve_round(pairs: list, playerlist: PlayerList, results: str):
                 player_B.opponents.append(f"{player_A.starting_number}+")
             a += 1
     playerlist.update_tiebreaks()
-    playerlist.print_player_list()
+    # playerlist.print_player_list()
     # c = input("next round - enter")
 
 

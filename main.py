@@ -4,6 +4,8 @@ import itertools
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
+from datetime import date
+import random
 
 # CONSTANTS
 version = "0.8 beta"
@@ -25,12 +27,12 @@ def update():
     my_game.column("Starting_Number", anchor=CENTER, width=80)
     my_game.column("Name", anchor=CENTER, width=80)
     my_game.column("Surname", anchor=CENTER, width=80)
-    my_game.column("Rating", anchor=CENTER, width=80)
-    my_game.column("Points", anchor=CENTER, width=60)
-    my_game.column("SOS", anchor=CENTER, width=60)
-    my_game.column("SOSOS", anchor=CENTER, width=60)
-    my_game.column("SODOS", anchor=CENTER, width=60)
-    my_game.column("Opponents", anchor=CENTER, width=120)
+    my_game.column("Rating", anchor=CENTER, width=50)
+    my_game.column("Points", anchor=CENTER, width=50)
+    my_game.column("SOS", anchor=CENTER, width=50)
+    my_game.column("SOSOS", anchor=CENTER, width=50)
+    my_game.column("SODOS", anchor=CENTER, width=50)
+    my_game.column("Opponents", anchor=CENTER, width=190)
 
     my_game.heading("#0", text="", anchor=CENTER)
     my_game.heading("Standing", text="Standing", anchor=CENTER)
@@ -58,23 +60,26 @@ def update():
 # START
 
 tournament_list = PlayerList()
-rounds = 3
+rounds = 0
 tournament_started = False
-tournament_list.add_player("Adam", "Dziwoki", 1965)
-tournament_list.add_player("Uladzislau", "Zakrzheuski", 2295)
-tournament_list.add_player("Mariusz", "Stanaszek", 1651)
-tournament_list.add_player("Krzysztof", "Sieja", 1840)
+# tournament_list.add_player("Adam", "Dziwoki", 1965)
+# tournament_list.add_player("Uladzislau", "Zakrzheuski", 2295)
+# tournament_list.add_player("Mariusz", "Stanaszek", 1651)
+# tournament_list.add_player("Krzysztof", "Sieja", 1840)
 
 # COMMANDS
 
 def addp_add():
-    name = name_entry.get()
-    surname = surname_entry.get()
-    rating = int(rating_entry.get())
-    tournament_list.add_player(name, surname, rating)
-    addp.destroy()
-    update()
-    print(tournament_list.list_of_players)
+
+    if rating_entry.get().isdigit() and int(rating_entry.get()) < 3000:
+        name = name_entry.get()
+        surname = surname_entry.get()
+        rating = int(rating_entry.get())
+        tournament_list.add_player(name, surname, rating)
+        addp.destroy()
+        update()
+    else:
+        messagebox.showinfo(title="Ooops...", message="The rating of the player should be a number below 3000!")
 
 def rmvp_rem():
     stn = int(stn_entry.get())
@@ -93,6 +98,7 @@ def srft_set():
 def set_rounds_window():
     global srft
     srft = Toplevel(window)
+    srft.attributes('-topmost', 'true')
     srft.config(padx=50, pady=50)
     srft.title('Set rounds')
     srft_label = Label(srft, text="Number of rounds:")
@@ -107,6 +113,7 @@ def set_rounds_window():
 def remove_player_window():
     global rmvp
     rmvp = Toplevel(window)
+    rmvp.attributes('-topmost', 'true')
     rmvp.config(padx=50, pady=50)
     rmvp.title('Remove player')
     stn_label = Label(rmvp, text="Starting number:")
@@ -125,6 +132,7 @@ def remove_player_window():
 def add_player_window():
     global addp
     addp = Toplevel(window)
+    addp.attributes('-topmost', 'true')
     addp.config(padx=50, pady=50)
     addp.title('Add player')
     name_label = Label(addp, text="Name:")
@@ -155,21 +163,31 @@ def add_player_window():
 current_pairing = []
 is_round_robin = False
 def start_tournament():
-    global tournament_started
-    tournament_started = True
-    add_player_button.destroy()
-    remove_player_button.destroy()
-    start_tournament_button.destroy()
-    set_rounds_button.destroy()
-    messagebox.showinfo(title="Onegaishimasu!", message="The tournament is ready to go, please enjoy your games!")
-    # choose_pairing_method(tournament_list, rounds)
-    global is_round_robin
-    if len(tournament_list.list_of_players) - rounds == 1:
-        is_round_robin = True
-    global next_round_button
-    next_round_button = Button(text="Next round", width=20, command=next_round)
-    next_round_button.grid(column=0, row=2)
-    next_round()
+    if rounds == 0:
+        messagebox.showinfo(title="Ooops...", message="The number of planned rounds is 0, please set a higher number of rounds!")
+    else:
+        if len(tournament_list.list_of_players) - rounds <= 0:
+            messagebox.showinfo(title="Ooops...", message="There is too many rounds for such number of players. Please set less rounds or add additional players!")
+        else:
+            global tournament_started
+            tournament_started = True
+            add_player_button.destroy()
+            remove_player_button.destroy()
+            start_tournament_button.destroy()
+            set_rounds_button.destroy()
+            # choose_pairing_method(tournament_list, rounds)
+            global is_round_robin
+            if len(tournament_list.list_of_players) - rounds == 1:
+                is_round_robin = True
+            if is_round_robin:
+                tournament_type = "round robin"
+            else:
+                tournament_type = "swiss"
+            messagebox.showinfo(title="Onegaishimasu!", message=f"The tournament is ready to go. According to the number of players and rounds, it will be paired in a {tournament_type} system. Please enjoy your games!")
+            global next_round_button
+            next_round_button = Button(text="Next round", width=20, command=next_round)
+            next_round_button.grid(column=0, row=2)
+            next_round()
 
 rr_pairing = []
 round = 1
@@ -180,15 +198,39 @@ def next_round():
     if is_round_robin:
         if round == 1:
             rr_pairing = round_robin_pairing(tournament_list)
-        print(rr_pairing)
         current_pairing = rr_pairing[round-1]
     else:
         current_pairing = sp_pairing_for_next_round(tournament_list)
     set_results_window(current_pairing, tournament_list)
     round += 1
 
+def export_results(playerlist):
+    today = date.today()
+    d1 = today.strftime("%Y-%m-%d")
+    rand = random.randint(10000,99999)
+    global filename
+    filename = f"tournament_results_{rand}"
+    with open(f'{filename}.txt', 'w') as r:
+        r.write("[Tournament, City]\n")
+        r.write(f"[{d1}]\n")
+        a = 1
+        for player in playerlist.list_of_players:
+            ops = ""
+            b = 0
+            for op in player.opponents:
+                if b == 1:
+                   ops += " "
+                b = 1
+                searched_ind = op[:-1]
+                ind = playerlist.find_player_by_starting_number(int(searched_ind))
+                ops += str(ind+1)
+                ops += op[-1]
+            r.write(f"{a} [{player.surname}] [{player.name}] [{ops}] {player.points}\n")
+            a += 1
+
+
 def exit_program():
-    print("exit")
+
     global exit
     exit = True
 
@@ -196,20 +238,32 @@ def reswin_input(pairlist):
     results_inputted = ""
     for pair in pairlist:
         results_inputted += str((pair.get()))
-    resolve_round(current_pairing, tournament_list, results_inputted)
-    reswin.destroy()
-    if round > rounds:
-        messagebox.showinfo(title="Arigato gozaimashita!", message="The tournament is completed!")
-        next_round_button.destroy()
-        exit_button = Button(text="Exit", width=20, command=exit_program)
-        exit_button.grid(column=0, row=2)
-    update()
+    if "0" in results_inputted:
+        messagebox.showinfo(title="Ooops...",
+                            message="It seems that not all results has been inputted. Please check it!")
+        reswin.grab_set_global()
+
+    # print(len(results_inputted))
+    # print(len(pairlist))
+    else:
+        resolve_round(current_pairing, tournament_list, results_inputted)
+        reswin.destroy()
+        if round > rounds:
+            messagebox.showinfo(title="Arigato gozaimashita!", message="The tournament is completed!")
+            next_round_button.destroy()
+            exit_button = Button(text="Exit", width=20, command=exit_program)
+            exit_button.grid(column=0, row=2)
+            export_results(tournament_list)
+            messagebox.showinfo(title="Results exported", message=f"Results has been exported to the {filename}.txt")
+        update()
+
 
 
 
 def set_results_window(pairs, playerlist):
     global reswin
     reswin = Toplevel(window)
+    reswin.attributes('-topmost', 'true')
     reswin.config(padx=50, pady=50)
     reswin.title('Round results')
     reswin_label = Label(reswin, text="Please input results:")
