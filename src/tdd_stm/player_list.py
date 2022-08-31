@@ -29,18 +29,17 @@ class PlayerList:
             starting_number += 1
 
     def remove_player(self, starting_number):
-        del self.list_of_players[starting_number-1]
+        del self.list_of_players[starting_number - 1]
         self.sort_player_list()
         starting_number = 1
         for player in self.list_of_players:
             player.starting_number = starting_number
             starting_number += 1
 
-
-
     def sort_player_list(self):
         self.list_of_players.sort(key=lambda player: (player.surname, player.name))
-        self.list_of_players.sort(reverse=True, key=lambda player: (player.points, player.sos, player.sosos, player.sodos, player.rating))
+        self.list_of_players.sort(reverse=True, key=lambda player: (
+        player.points, player.sos, player.sosos, player.sodos, player.rating))
 
     def find_player_by_starting_number(self, number: int):
         index = next((i for i, player in enumerate(self.list_of_players) if player.starting_number == number), -1)
@@ -48,8 +47,8 @@ class PlayerList:
 
     def print_player_list(self):
         for player in self.list_of_players:
-            print(f"SN{player.starting_number} N: {player.name} S: {player.surname} R: {player.rating} P:{player.points} S:{player.sos} SS: {player.sosos} SD: {player.sodos} O: {player.opponents}")
-
+            print(
+                f"SN{player.starting_number} N: {player.name} S: {player.surname} R: {player.rating} P:{player.points} S:{player.sos} SS: {player.sosos} SD: {player.sodos} O: {player.opponents}")
 
     def update_tiebreaks(self):
         for player in self.list_of_players:
@@ -96,6 +95,3 @@ class PlayerList:
                 opponent_checked += 1
             player.sodos = sodos
         self.sort_player_list()
-
-
-

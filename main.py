@@ -1,6 +1,5 @@
 from src.tdd_stm.pairing import *
-from src.tdd_stm.player_list import Player, PlayerList
-import itertools
+from src.tdd_stm.player_list import PlayerList
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
@@ -8,7 +7,6 @@ from datetime import date
 import random
 
 # CONSTANTS
-version = "0.8 beta"
 FONT_NAME = "arial"
 
 
@@ -17,26 +15,26 @@ def update():
     game_frame = Frame(window)
 
     my_game = ttk.Treeview(game_frame)
-    game_frame.grid(column=1, row=1)
+    game_frame.grid(column=1, row=1, rowspan=6)
 
     my_game['columns'] = (
-    'Standing', 'Starting_Number', 'Name', 'Surname', 'Rating', 'Points', 'SOS', 'SOSOS', 'SODOS', 'Opponents')
+        'Standing', 'Starting_Number', 'Name', 'Surname', 'Rating', 'Points', 'SOS', 'SOSOS', 'SODOS', 'Opponents')
 
     my_game.column("#0", width=0, stretch=NO)
-    my_game.column("Standing", anchor=CENTER, width=80)
-    my_game.column("Starting_Number", anchor=CENTER, width=80)
-    my_game.column("Name", anchor=CENTER, width=80)
-    my_game.column("Surname", anchor=CENTER, width=80)
+    my_game.column("Standing", anchor=CENTER, width=60)
+    my_game.column("Starting_Number", anchor=CENTER, width=60)
+    my_game.column("Name", anchor=CENTER, width=70)
+    my_game.column("Surname", anchor=CENTER, width=70)
     my_game.column("Rating", anchor=CENTER, width=50)
     my_game.column("Points", anchor=CENTER, width=50)
     my_game.column("SOS", anchor=CENTER, width=50)
     my_game.column("SOSOS", anchor=CENTER, width=50)
     my_game.column("SODOS", anchor=CENTER, width=50)
-    my_game.column("Opponents", anchor=CENTER, width=190)
+    my_game.column("Opponents", anchor=CENTER, width=260)
 
     my_game.heading("#0", text="", anchor=CENTER)
     my_game.heading("Standing", text="Standing", anchor=CENTER)
-    my_game.heading("Starting_Number", text="Starting Number", anchor=CENTER)
+    my_game.heading("Starting_Number", text="Start Num", anchor=CENTER)
     my_game.heading("Name", text="Name", anchor=CENTER)
     my_game.heading("Surname", text="Surname", anchor=CENTER)
     my_game.heading("Rating", text="Rating", anchor=CENTER)
@@ -57,20 +55,16 @@ def update():
     left_label = Label(text=f"Rounds: {rounds} \nPlayers: {len(tournament_list.list_of_players)}")
     left_label.grid(column=0, row=1)
 
+
 # START
 
 tournament_list = PlayerList()
 rounds = 0
 tournament_started = False
-# tournament_list.add_player("Adam", "Dziwoki", 1965)
-# tournament_list.add_player("Uladzislau", "Zakrzheuski", 2295)
-# tournament_list.add_player("Mariusz", "Stanaszek", 1651)
-# tournament_list.add_player("Krzysztof", "Sieja", 1840)
 
-# COMMANDS
+# COMMANDS AND GUI ELEMENTS
 
 def addp_add():
-
     if rating_entry.get().isdigit() and int(rating_entry.get()) < 3000:
         name = name_entry.get()
         surname = surname_entry.get()
@@ -81,12 +75,13 @@ def addp_add():
     else:
         messagebox.showinfo(title="Ooops...", message="The rating of the player should be a number below 3000!")
 
+
 def rmvp_rem():
     stn = int(stn_entry.get())
-    player_to_delete = tournament_list.find_player_by_starting_number(stn)
     tournament_list.remove_player(stn)
     rmvp.destroy()
     update()
+
 
 def srft_set():
     rnds = int(srft_entry.get())
@@ -94,6 +89,7 @@ def srft_set():
     rounds = rnds
     srft.destroy()
     update()
+
 
 def set_rounds_window():
     global srft
@@ -110,6 +106,7 @@ def set_rounds_window():
     srft_button = Button(srft, text="Set rounds", width=20, command=srft_set)
     srft_button.grid(column=0, row=1, columnspan=2)
 
+
 def remove_player_window():
     global rmvp
     rmvp = Toplevel(window)
@@ -125,8 +122,6 @@ def remove_player_window():
 
     addp_button = Button(rmvp, text="Remove player", width=20, command=rmvp_rem)
     addp_button.grid(column=0, row=1, columnspan=2)
-
-    # update()
 
 
 def add_player_window():
@@ -159,15 +154,19 @@ def add_player_window():
     addp_button = Button(addp, text="Add player", width=20, command=addp_add)
     addp_button.grid(column=0, row=3, columnspan=2)
 
-    # update()
+
 current_pairing = []
 is_round_robin = False
+
+
 def start_tournament():
     if rounds == 0:
-        messagebox.showinfo(title="Ooops...", message="The number of planned rounds is 0, please set a higher number of rounds!")
+        messagebox.showinfo(title="Ooops...",
+                            message="The number of planned rounds is 0, please set a higher number of rounds!")
     else:
         if len(tournament_list.list_of_players) - rounds <= 0:
-            messagebox.showinfo(title="Ooops...", message="There is too many rounds for such number of players. Please set less rounds or add additional players!")
+            messagebox.showinfo(title="Ooops...",
+                                message="There is too many rounds for such number of players. Please set less rounds or add additional players!")
         else:
             global tournament_started
             tournament_started = True
@@ -175,7 +174,6 @@ def start_tournament():
             remove_player_button.destroy()
             start_tournament_button.destroy()
             set_rounds_button.destroy()
-            # choose_pairing_method(tournament_list, rounds)
             global is_round_robin
             if len(tournament_list.list_of_players) - rounds == 1:
                 is_round_robin = True
@@ -183,14 +181,18 @@ def start_tournament():
                 tournament_type = "round robin"
             else:
                 tournament_type = "swiss"
-            messagebox.showinfo(title="Onegaishimasu!", message=f"The tournament is ready to go. According to the number of players and rounds, it will be paired in a {tournament_type} system. Please enjoy your games!")
+            messagebox.showinfo(title="Onegaishimasu!",
+                                message=f"The tournament is ready to go. According to the number of players and rounds, it will be paired in a {tournament_type} system. Please enjoy your games!")
             global next_round_button
             next_round_button = Button(text="Next round", width=20, command=next_round)
             next_round_button.grid(column=0, row=2)
             next_round()
 
+
 rr_pairing = []
 round = 1
+
+
 def next_round():
     global round
     global current_pairing
@@ -198,16 +200,17 @@ def next_round():
     if is_round_robin:
         if round == 1:
             rr_pairing = round_robin_pairing(tournament_list)
-        current_pairing = rr_pairing[round-1]
+        current_pairing = rr_pairing[round - 1]
     else:
         current_pairing = sp_pairing_for_next_round(tournament_list)
     set_results_window(current_pairing, tournament_list)
     round += 1
 
+
 def export_results(playerlist):
     today = date.today()
     d1 = today.strftime("%Y-%m-%d")
-    rand = random.randint(10000,99999)
+    rand = random.randint(10000, 99999)
     global filename
     filename = f"tournament_results_{rand}"
     with open(f'{filename}.txt', 'w') as r:
@@ -219,20 +222,20 @@ def export_results(playerlist):
             b = 0
             for op in player.opponents:
                 if b == 1:
-                   ops += " "
+                    ops += " "
                 b = 1
                 searched_ind = op[:-1]
                 ind = playerlist.find_player_by_starting_number(int(searched_ind))
-                ops += str(ind+1)
+                ops += str(ind + 1)
                 ops += op[-1]
             r.write(f"{a} [{player.surname}] [{player.name}] [{ops}] {player.points}\n")
             a += 1
 
 
 def exit_program():
-
     global exit
     exit = True
+
 
 def reswin_input(pairlist):
     results_inputted = ""
@@ -242,9 +245,6 @@ def reswin_input(pairlist):
         messagebox.showinfo(title="Ooops...",
                             message="It seems that not all results has been inputted. Please check it!")
         reswin.grab_set_global()
-
-    # print(len(results_inputted))
-    # print(len(pairlist))
     else:
         resolve_round(current_pairing, tournament_list, results_inputted)
         reswin.destroy()
@@ -256,8 +256,6 @@ def reswin_input(pairlist):
             export_results(tournament_list)
             messagebox.showinfo(title="Results exported", message=f"Results has been exported to the {filename}.txt")
         update()
-
-
 
 
 def set_results_window(pairs, playerlist):
@@ -279,15 +277,10 @@ def set_results_window(pairs, playerlist):
         pA = Radiobutton(reswin, text=f"{player_A.name} {player_A.surname}", variable=winner, value=1).grid(row=a, column=1)
         pB = Radiobutton(reswin, text=f"{player_B.name} {player_B.surname}", variable=winner, value=2).grid(row=a, column=2)
         pairlist.append(winner)
-        a+=1
+        a += 1
     reswin_button = Button(reswin, text="Input results", width=20, command=lambda: reswin_input(pairlist))
-    reswin_button.grid(row=a+1, column=1)
+    reswin_button.grid(row=a + 1, column=1)
 
-
-
-
-
-#UI
 
 window = Tk()
 window.title("Shogi Tournament Manager")
@@ -301,7 +294,6 @@ window.config(padx=50, pady=50)
 title_label = Label(text="Shogi Tournament Manager", font=(FONT_NAME, 40, "bold"), fg="red")
 title_label.grid(column=0, row=0, columnspan=2)
 
-
 set_rounds_button = Button(text="Set number of rounds", width=20, command=set_rounds_window)
 set_rounds_button.grid(column=0, row=3)
 
@@ -314,68 +306,8 @@ remove_player_button.grid(column=0, row=5)
 start_tournament_button = Button(text="Start tournament", width=20, command=start_tournament)
 start_tournament_button.grid(column=0, row=6)
 
-
-
-
-
 update()
-
-
 
 exit = False
 while not exit:
     window.update()
-#
-# test = PlayerList()
-# # test.add_player("Janik", "Kruse", 1563)
-# # test.add_player("Paradowski", "Dawid", 1909)
-# # test.add_player("Paily", "Andriy", 1857)
-# # test.add_player("Adam", "Dziwoki", 2018)
-# # test.add_player("Omelchuk", "Roman", 1870)
-# # test.add_player("Markowski", "Sebastian", 1223)
-# # test.add_player("Roman", "Milosz", 1754)
-# # test.add_player("Adaszewski", "Grzegorz", 1601)
-#
-# # test.add_player("Pfaffel", "Thomas", 1965)
-# # test.add_player("Kasai", "Takehiko", 1485)
-# # test.add_player("Cain", "Steven", 1861)
-# # test.add_player("Vyletel", "Lukas", 1521)
-# # test.add_player("Trauner", "Andrej", 1331)
-# # test.add_player("Schmied", "Horst", 1257)
-# # test.add_player("Katona", "Timea", 830)
-# # test.add_player("Saito", "Yusuke", 1)
-#
-# def add_13_players():
-#     test.add_player("Adam", "Dziwoki", 1965)
-#     test.add_player("Uladzislau", "Zakrzheuski", 2295)
-#     test.add_player("Mariusz", "Stanaszek", 1651)
-#     test.add_player("Stefanos", "Mandalas", 1918)
-#     test.add_player("Milosz", "Roman", 1693)
-#     test.add_player("Iori", "Matsumoto", 1625)
-#     test.add_player("Krzysztof", "Sieja", 1854)
-#     test.add_player("Michal", "Mordarski", 1551)
-#     test.add_player("Pawel", "Hunczak", 1332)
-#     test.add_player("Grzegorz", "Adaszewski", 1615)
-#     test.add_player("Franciszek", "Mordarski", 1346)
-#     test.add_player("Jacek", "Prochal", 1207)
-#     test.add_player("Krzysztof", "Orlinski", 1231)
-# # test.add_player("Marcin", "Kozlowski", 941)
-#
-# test.print_player_list()
-#
-# a = 0
-# while a < 1:
-#     # blockPrint()
-#     add_13_players()
-#     choose_pairing_method(test, 9)
-#     test.list_of_players = []
-#     a+= 1
-#     # enablePrint()
-#     # print(a)
-
-
-
-
-
-
-
